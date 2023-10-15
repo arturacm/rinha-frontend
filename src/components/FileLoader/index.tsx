@@ -8,16 +8,19 @@ type FileLoaderProps = {
 function FileLoader({ setJsonFile }: FileLoaderProps) {
   const [hasInputError, setInputError] = useState(false);
 
-  const handleFileInput = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.type === "application/json") {
-      setJsonFile(file);
-      setInputError(false);
-    } else {
-      setInputError(true);
-    }
-  }, []);
+  const handleFileInput = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      if (file.type === "application/json") {
+        setJsonFile(file);
+        setInputError(false);
+      } else {
+        setInputError(true);
+      }
+    },
+    [setJsonFile]
+  );
 
   return (
     <div className={styles.container}>

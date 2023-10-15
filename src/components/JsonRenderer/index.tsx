@@ -19,7 +19,7 @@ function JsonRenderer({ json }: JsonRendererProps) {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [json]);
 
   return (
     <div className={styles.container}>
@@ -45,7 +45,7 @@ function renderJson(
             return (
               <p className={styles.children} key={orderKey}>
                 <span className={styles.arrayIndex}>{index}:</span>
-                <span> "{el}"</span>
+                <span> &quot;{el}&quot;</span>
               </p>
             );
           }
@@ -78,7 +78,7 @@ function renderJson(
     if (typeof value === "string") {
       return (
         <p key={orderKey}>
-          <span className={styles.key}>{key}:</span> <span>"{value}"</span>
+          <span className={styles.key}>{key}:</span> <span>&quot;{value}&quot;</span>
         </p>
       );
     }
@@ -96,7 +96,7 @@ function renderJson(
               return (
                 <p className={styles.children} key={arrayOrderKey}>
                   <span className={styles.arrayIndex}>{index}:</span>
-                  <span> "{el}"</span>
+                  <span> &quot;{el}&quot;</span>
                 </p>
               );
             }
