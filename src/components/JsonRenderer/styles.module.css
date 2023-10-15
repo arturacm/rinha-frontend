@@ -1,0 +1,44 @@
+.container {
+  min-height: 100vh;
+  width: 638px;
+  max-width: 100vw;
+}
+
+.title {
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  padding-top: 24px;
+  padding-bottom: 10px;
+}
+
+.key {
+  color: #4e9590;
+}
+
+.children {
+  padding-left: 1.5rem;
+  margin-left: 0.5rem;
+  border-left: 1px solid #bfbfbf;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 176.523%; /* 28.244px */
+}
+
+.squareBrackets {
+  color: #f2cab8;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 176.523%;
+}
+
+.arrayIndex {
+  color: #bfbfbf;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 176.523%;
+}
