@@ -33,6 +33,8 @@ function renderJson(
   json: Record<string, any> | Record<string, any>[],
   keyInheritance: string = "root"
 ) {
+  if (json === null) return;
+
   if (Array.isArray(json)) {
     return (
       <Fragment key={keyInheritance}>
@@ -49,7 +51,7 @@ function renderJson(
               </p>
             );
           }
-          if (typeof el === "object") {
+          if (typeof el === "object" && el !== null) {
             return (
               <div className={styles.children} key={orderKey}>
                 <p>
@@ -103,7 +105,7 @@ function renderJson(
                 </p>
               );
             }
-            if (typeof el === "object") {
+            if (typeof el === "object" && el !== null) {
               return (
                 <Fragment key={arrayOrderKey}>
                   <p>
@@ -128,7 +130,7 @@ function renderJson(
         </Fragment>
       );
     }
-    if (typeof value === "object") {
+    if (typeof value === "object" && value !== null) {
       return (
         <Fragment key={orderKey}>
           <p>
