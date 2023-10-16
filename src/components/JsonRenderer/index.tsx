@@ -52,7 +52,9 @@ function renderJson(
           if (typeof el === "object") {
             return (
               <div className={styles.children} key={orderKey}>
-                <span className={styles.arrayIndex}>{index}:</span>
+                <p>
+                  <span className={styles.arrayIndex}>{index}:</span>
+                </p>
                 <div className={styles.children}>
                   {renderJson(el, orderKey)}
                 </div>
@@ -78,7 +80,8 @@ function renderJson(
     if (typeof value === "string") {
       return (
         <p key={orderKey}>
-          <span className={styles.key}>{key}:</span> <span>&quot;{value}&quot;</span>
+          <span className={styles.key}>{key}:</span>{" "}
+          <span>&quot;{value}&quot;</span>
         </p>
       );
     }
@@ -103,7 +106,9 @@ function renderJson(
             if (typeof el === "object") {
               return (
                 <Fragment key={arrayOrderKey}>
-                  <span className={styles.arrayIndex}>{index}:</span>
+                  <p>
+                    <span className={styles.arrayIndex}>{index}:</span>
+                  </p>
                   <div className={styles.children}>
                     {renderJson(el, orderKey)}
                   </div>
