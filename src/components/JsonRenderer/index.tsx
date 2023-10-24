@@ -10,16 +10,27 @@ function JsonRenderer({ json }: JsonRendererProps) {
   const [parsedObj, setParsedObj] = useState<Record<string, any>>();
 
   useEffect(() => {
-    setLoading(true);
-    json
-      .text()
-      .then((res) => {
-        setParsedObj(JSON.parse(res));
-      })
-      .finally(() => {
+    const jsonFileReader = new FileReader();
+
+    function readerLoadHandler(e: ProgressEvent<FileReader>) {
+      const fileContent = e.target?.result as string;
+
+      try {
+        const parsed = JSON.parse(fileContent);
+        setParsedObj(parsed);
+      } catch (err) {
+        console.error(
+          "Invalid JSON: there was a problem while loading the JSON file."
+        );
+      } finally {
         setLoading(false);
-      });
-  }, [json]);
+      }
+    }
+
+    setLoading(true);
+    jsonFileReader.addEventListener("load", readerLoadHandler);
+    jsonFileReader.readAsText(json, "UTF-8");
+  }, [json, setError]);
 
   return (
     <div className={styles.container}>
