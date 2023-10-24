@@ -3,10 +3,11 @@ import styles from "./styles.module.css";
 
 type JsonRendererProps = {
   json: File;
+  setError: (error: string) => void;
 };
 
-function JsonRenderer({ json }: JsonRendererProps) {
-  const [loading, setLoading] = useState(false);
+function JsonRenderer({ json, setError }: JsonRendererProps) {
+  const [loading, setLoading] = useState<boolean>();
   const [parsedObj, setParsedObj] = useState<Record<string, any>>();
 
   useEffect(() => {
@@ -19,7 +20,7 @@ function JsonRenderer({ json }: JsonRendererProps) {
         const parsed = JSON.parse(fileContent);
         setParsedObj(parsed);
       } catch (err) {
-        console.error(
+        setError(
           "Invalid JSON: there was a problem while loading the JSON file."
         );
       } finally {

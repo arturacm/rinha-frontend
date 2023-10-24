@@ -7,13 +7,18 @@ import JsonRenderer from "@/components/JsonRenderer";
 
 export default function Home() {
   const [jsonFile, setJsonFile] = useState<File>();
+  const [error, setError] = useState<string>();
 
   return (
     <main className={styles.main}>
-      {jsonFile ? (
-        <JsonRenderer json={jsonFile} />
+      {jsonFile && !error ? (
+        <JsonRenderer setError={setError} json={jsonFile} />
       ) : (
-        <FileLoader setJsonFile={setJsonFile} />
+        <FileLoader
+          setJsonFile={setJsonFile}
+          setError={setError}
+          error={error}
+        />
       )}
     </main>
   );

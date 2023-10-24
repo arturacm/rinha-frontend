@@ -42,3 +42,11 @@
   font-weight: 400;
   line-height: 176.523%;
 }
+
+.error {
+  color: #bf0e0e;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}

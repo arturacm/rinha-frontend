@@ -3,23 +3,23 @@ import styles from "./styles.module.css";
 
 type FileLoaderProps = {
   setJsonFile: (file: File) => void;
+  error?: string;
+  setError: (error?: string) => void;
 };
 
-function FileLoader({ setJsonFile }: FileLoaderProps) {
-  const [hasInputError, setInputError] = useState(false);
-
+function FileLoader({ setJsonFile, error, setError }: FileLoaderProps) {
   const handleFileInput = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
       if (file.type === "application/json") {
         setJsonFile(file);
-        setInputError(false);
+        setError(undefined);
       } else {
-        setInputError(true);
+        setError("Invalid file. Please load a valid JSON file.");
       }
     },
-    [setJsonFile]
+    [setJsonFile, setError]
   );
 
   return (
@@ -38,11 +38,7 @@ function FileLoader({ setJsonFile }: FileLoaderProps) {
         className={styles.jsonInput}
         onChange={handleFileInput}
       />
-      {hasInputError ? (
-        <span className={styles.error}>
-          Invalid file. Please load a valid JSON file.
-        </span>
-      ) : null}
+      {error ? <span className={styles.error}>{error}</span> : null}
     </div>
   );
 }
