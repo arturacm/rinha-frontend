@@ -1,5 +1,6 @@
-import React, { useEffect, useState, Fragment } from "react";
+import React, { useEffect, useState, Fragment, useRef, ReactNode } from "react";
 import styles from "./styles.module.css";
+import useOnScreen from "@/utils/useOnScreen";
 
 type JsonRendererProps = {
   json: File;
@@ -9,6 +10,28 @@ type JsonRendererProps = {
 function JsonRenderer({ json, setError }: JsonRendererProps) {
   const [loading, setLoading] = useState<boolean>();
   const [parsedObj, setParsedObj] = useState<Record<string, any>>();
+  const [chunks, setChunks] = useState(10);
+  const visibility = useRef(null);
+  const isVisible = useOnScreen(visibility);
+  const [endOfList, setEndOfList] = useState(false);
+  const renderedPs = useRef(0);
+
+  useEffect(() => {
+    if (!isVisible) return;
+    if (endOfList) return;
+
+    const ps = document.querySelectorAll("p").length;
+
+    if (renderedPs.current !== ps) {
+      renderedPs.current = ps;
+      setChunks((prev) => prev + 5);
+    } else {
+      if (chunks >= 15) {
+        console.log("end of list");
+        setEndOfList(true);
+      }
+    }
+  }, [isVisible, endOfList, chunks]);
 
   useEffect(() => {
     const jsonFileReader = new FileReader();
@@ -36,53 +59,77 @@ function JsonRenderer({ json, setError }: JsonRendererProps) {
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>{json.name}</h1>
-      {loading ? "LOADING" : parsedObj && renderJson(parsedObj)}
+      {loading
+        ? "LOADING"
+        : parsedObj && renderJson(parsedObj, "root", 0, chunks)}
+      {!endOfList ? (
+        <div
+          ref={visibility}
+          style={{ height: 2, width: 2, backgroundColor: "red" }}
+        />
+      ) : null}
     </div>
   );
 }
 
 function renderJson(
   json: Record<string, any> | Record<string, any>[],
-  keyInheritance: string = "root"
-) {
-  if (json === null) return;
+  keyInheritance: string,
+  chunksCounter: number,
+  chunksLimit: number
+): ReactNode {
+  if (json === null) return null;
+  if (chunksCounter > chunksLimit) return null;
 
   if (Array.isArray(json)) {
     return (
       <Fragment key={keyInheritance}>
-        <p>
+        <p id={`${++chunksCounter}`}>
           <span className={styles.squareBrackets}>{"["}</span>
         </p>
         {json.map((el, index) => {
           const orderKey = `${keyInheritance}-array-${index}`;
           if (typeof el === "string") {
             return (
-              <p className={styles.children} key={orderKey}>
+              <p
+                id={`${++chunksCounter}`}
+                className={styles.children}
+                key={orderKey}
+              >
                 <span className={styles.arrayIndex}>{index}:</span>
                 <span> &quot;{el}&quot;</span>
               </p>
             );
           }
           if (typeof el === "object" && el !== null) {
-            return (
+            const children = renderJson(
+              el,
+              orderKey,
+              chunksCounter,
+              chunksLimit
+            );
+            return children ? (
               <div className={styles.children} key={orderKey}>
-                <p>
+                <p id={`${++chunksCounter}`}>
                   <span className={styles.arrayIndex}>{index}:</span>
                 </p>
-                <div className={styles.children}>
-                  {renderJson(el, orderKey)}
-                </div>
+
+                <div className={styles.children}>{children}</div>
               </div>
-            );
+            ) : null;
           }
           return (
-            <p className={styles.children} key={orderKey}>
+            <p
+              id={`${++chunksCounter}`}
+              className={styles.children}
+              key={orderKey}
+            >
               <span className={styles.arrayIndex}>{index}:</span>
               <span> {`${el}`}</span>
             </p>
           );
         })}
-        <p>
+        <p id={`${++chunksCounter}`}>
           <span className={styles.squareBrackets}>{"]"}</span>
         </p>
       </Fragment>
@@ -93,7 +140,7 @@ function renderJson(
     const orderKey = `${keyInheritance}-${key}`;
     if (typeof value === "string") {
       return (
-        <p key={orderKey}>
+        <p id={`${++chunksCounter}`} key={orderKey}>
           <span className={styles.key}>{key}:</span>{" "}
           <span>&quot;{value}&quot;</span>
         </p>
@@ -103,7 +150,7 @@ function renderJson(
     if (Array.isArray(value)) {
       return (
         <Fragment key={orderKey}>
-          <p>
+          <p id={`${++chunksCounter}`}>
             <span className={styles.key}>{key}:</span>{" "}
             <span className={styles.squareBrackets}>{"["}</span>
           </p>
@@ -111,49 +158,63 @@ function renderJson(
             const arrayOrderKey = `array-${index}${orderKey}`;
             if (typeof el === "string") {
               return (
-                <p className={styles.children} key={arrayOrderKey}>
+                <p
+                  id={`${++chunksCounter}`}
+                  className={styles.children}
+                  key={arrayOrderKey}
+                >
                   <span className={styles.arrayIndex}>{index}:</span>
                   <span> &quot;{el}&quot;</span>
                 </p>
               );
             }
             if (typeof el === "object" && el !== null) {
-              return (
+              const children = renderJson(
+                el,
+                orderKey,
+                chunksCounter,
+                chunksLimit
+              );
+              return children ? (
                 <Fragment key={arrayOrderKey}>
-                  <p>
+                  <p id={`${++chunksCounter}`}>
                     <span className={styles.arrayIndex}>{index}:</span>
                   </p>
-                  <div className={styles.children}>
-                    {renderJson(el, orderKey)}
-                  </div>
+                  <div className={styles.children}>{children}</div>
                 </Fragment>
-              );
+              ) : null;
             }
             return (
-              <p className={styles.children} key={arrayOrderKey}>
+              <p
+                id={`${++chunksCounter}`}
+                className={styles.children}
+                key={arrayOrderKey}
+              >
                 <span className={styles.arrayIndex}>{index}:</span>
                 <span> {`${el}`}</span>
               </p>
             );
           })}
-          <p>
+          <p id={`${++chunksCounter}`}>
             <span className={styles.squareBrackets}>{"]"}</span>
           </p>
         </Fragment>
       );
     }
     if (typeof value === "object" && value !== null) {
-      return (
+      const children = renderJson(value, orderKey, chunksCounter, chunksLimit);
+
+      return children ? (
         <Fragment key={orderKey}>
-          <p>
+          <p id={`${++chunksCounter}`}>
             <span className={styles.key}>{key}:</span>
           </p>
-          <div className={styles.children}>{renderJson(value, orderKey)}</div>
+          <div className={styles.children}>{children}</div>
         </Fragment>
-      );
+      ) : null;
     }
     return (
-      <p key={orderKey}>
+      <p id={`${++chunksCounter}`} key={orderKey}>
         <span className={styles.key}>{key}:</span> <span>{`${value}`}</span>
       </p>
     );
